@@ -35,10 +35,6 @@ $user_type = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : 'customer'
                 <li><a href="index.php#contact">Kontak</a></li>
                 
                 <?php if ($is_logged_in): ?>
-                    <?php if ($viewing_as_customer && $is_staff): ?>
-                        <li><a href="staff/dashboard.php" class="btn-staff-return">← Back to Staff Dashboard</a></li>
-                    <?php endif; ?>
-                    
                     <?php if ($user_type == 'customer' || $viewing_as_customer): ?>
                         <li><a href="order-history.php">Sejarah Order</a></li>
                     <?php endif; ?>
@@ -70,6 +66,15 @@ $user_type = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : 'customer'
                     <a href="create-order.php" class="btn btn-special">Create a New Order</a>
                 <?php endif; ?>
             </div>
+            
+            <!-- Back to Staff Dashboard Button - Moved Below -->
+            <?php if ($viewing_as_customer && $is_staff): ?>
+                <div class="staff-return-container">
+                    <a href="staff/dashboard.php" class="btn-staff-return-full">
+                        ← Back to Staff Dashboard
+                    </a>
+                </div>
+            <?php endif; ?>
         </div>
         <div class="particles" id="particles"></div>
     </section>
@@ -97,7 +102,7 @@ $user_type = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : 'customer'
                     <img src="images/asus.jpg" alt="ASUS">
                     <div class="slide-content">
                         <h3>ASUS</h3>
-                        <p>ASUS adalah pemimpin global dalam inovasi teknologi laptop gaming dan produktivitas. Sebagai service partner resmi ASUS, kami menyediakan layanan perbaikan dengan teknisi bersertifikat dan spare part original. Dari seri ROG Gaming hingga ZenBook premium, kami menangani semua lini produk ASUS dengan garansi resmi dan harga kompetitif.</p>
+                        <p>ASUS adalah pemimpin global dalam inovasi teknologi laptop gaming dan produktivitas. Sebagai service partner resmi ASUS, kami menyediakan layanan perbaikan dengan teknisi bersertifikat dan spare part original.</p>
                     </div>
                 </div>
 
@@ -106,7 +111,7 @@ $user_type = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : 'customer'
                     <img src="images/lenovo.jpg" alt="Lenovo">
                     <div class="slide-content">
                         <h3>Lenovo</h3>
-                        <p>Lenovo dikenal dengan laptop business dan ThinkPad yang legendaris. Sebagai service partner Lenovo, kami menawarkan solusi perbaikan cepat untuk semua seri Lenovo termasuk IdeaPad, Legion, dan ThinkPad. Dengan akses ke parts original dan dukungan teknis langsung dari Lenovo, kepuasan pelanggan adalah prioritas kami.</p>
+                        <p>Lenovo merupakan brand terkemuka untuk laptop bisnis dan personal computing. Kami siap melayani perbaikan dan maintenance laptop Lenovo ThinkPad, IdeaPad, dan Legion dengan jaminan kualitas terbaik.</p>
                     </div>
                 </div>
 
@@ -115,7 +120,7 @@ $user_type = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : 'customer'
                     <img src="images/epson.jpg" alt="Epson">
                     <div class="slide-content">
                         <h3>Epson</h3>
-                        <p>Epson adalah brand printer terkemuka dengan teknologi EcoTank yang revolusioner. Kami menyediakan service resmi untuk semua jenis printer Epson, dari L-Series hingga printer bisnis high-end. Dapatkan maintenance berkala, refill tinta original, dan perbaikan dengan garansi up to 3 tahun untuk biaya service dan 1 tahun untuk spare parts.</p>
+                        <p>Sebagai service partner Epson, kami menyediakan layanan maintenance dan perbaikan printer Epson. Dari printer rumahan hingga printer bisnis, kami siap membantu dengan teknisi berpengalaman.</p>
                     </div>
                 </div>
 
@@ -124,7 +129,7 @@ $user_type = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : 'customer'
                     <img src="images/canon.jpg" alt="Canon">
                     <div class="slide-content">
                         <h3>Canon</h3>
-                        <p>Canon terkenal dengan kualitas cetak yang superior untuk printer dan multifungsi. Service center kami melayani perbaikan printer Canon PIXMA, imageCLASS, dan seri profesional lainnya. Teknisi kami terlatih menangani berbagai masalah dari paper jam hingga print head cleaning dengan menggunakan tools dan parts resmi Canon.</p>
+                        <p>Canon adalah brand terpercaya untuk printer dan scanner berkualitas tinggi. Kami melayani service dan maintenance printer Canon dengan spare part original dan garansi resmi.</p>
                     </div>
                 </div>
 
@@ -133,62 +138,33 @@ $user_type = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : 'customer'
                     <img src="images/axioo.jpg" alt="Axioo">
                     <div class="slide-content">
                         <h3>Axioo</h3>
-                        <p>Axioo adalah brand lokal Indonesia yang menawarkan laptop berkualitas dengan harga terjangkau. Sebagai authorized service partner, kami memberikan layanan perbaikan untuk semua produk Axioo termasuk MyBook dan Hype series. Nikmati kemudahan klaim garansi dan akses spare part original dengan harga kompetitif.</p>
+                        <p>Axioo adalah brand laptop lokal Indonesia yang berkualitas. Sebagai service partner resmi, kami siap melayani perbaikan laptop Axioo dengan teknisi tersertifikasi dan spare part original.</p>
                     </div>
                 </div>
 
                 <!-- MSI -->
                 <div class="gallery-slide">
-                    <img src="images/msi.webp" alt="MSI">
+                    <img src="images/msi.jpg" alt="MSI">
                     <div class="slide-content">
-                        <h3>MSI (Micro-Star International)</h3>
-                        <p>MSI adalah raja laptop gaming dengan performa extreme dan desain futuristik. Service center kami specialized dalam menangani laptop MSI gaming dan workstation dengan cooling system kompleks. Dari upgrade RAM dan SSD hingga repaste thermal dan cleaning deep, kami pastikan laptop gaming Anda tetap perform maksimal.</p>
+                        <h3>MSI</h3>
+                        <p>MSI merupakan brand premium untuk laptop gaming dan workstation. Kami menyediakan layanan service untuk laptop MSI dengan penanganan khusus untuk komponen gaming high-end.</p>
                     </div>
                 </div>
 
                 <!-- HP -->
                 <div class="gallery-slide">
-                    <img src="images/hp.webp" alt="HP">
+                    <img src="images/hp.jpg" alt="HP">
                     <div class="slide-content">
-                        <h3>HP (Hewlett-Packard)</h3>
-                        <p>HP adalah pioneer teknologi komputer sejak 1939 dengan reputasi global yang solid. Service partner HP kami melayani perbaikan untuk semua lini produk HP termasuk Pavilion, Envy, Omen Gaming, dan EliteBook business series. Dapatkan diagnostic gratis, garansi service, dan penanganan cepat untuk semua kebutuhan HP Anda.</p>
+                        <h3>HP (Hewlett Packard)</h3>
+                        <p>HP adalah salah satu brand komputer terbesar di dunia. Kami melayani service laptop dan printer HP dengan teknisi bersertifikat, spare part original, dan garansi resmi dari HP.</p>
                     </div>
                 </div>
             </div>
 
             <!-- Gallery Controls -->
             <div class="gallery-controls">
-                <button class="gallery-btn prev">❮</button>
-                <button class="gallery-btn next">❯</button>
-            </div>
-        </div>
-    </section>
-
-<!-- Features Section -->
-    <section class="features">
-        <div class="animated-arrow-right"></div>
-        <div class="container">
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🔧</div>
-                    <h3>Expert Technicians</h3>
-                    <p>Teknisi bersertifikat dengan pengalaman bertahun-tahun</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">⚡</div>
-                    <h3>Fast Turnaround</h3>
-                    <p>Layanan servis yang cepat dan efisien</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">✓</div>
-                    <h3>Warranty Service</h3>
-                    <p>Service partner resmi untuk berbagai merk ternama</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🏆</div>
-                    <h3>Multi-Brand Support</h3>
-                    <p>ASUS, Lenovo, HP, Canon, Epson & banyak lagi</p>
-                </div>
+                <button class="gallery-btn prev">‹</button>
+                <button class="gallery-btn next">›</button>
             </div>
         </div>
     </section>
@@ -363,8 +339,6 @@ $user_type = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : 'customer'
     </div>
     <?php endif; ?>
 
-    <script src="js/script.js"></script>
     <script src="js/chat.js"></script>
-</body>
 </body>
 </html>
