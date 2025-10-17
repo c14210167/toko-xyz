@@ -1,0 +1,161 @@
+=== NEW REQUEST ===
+2025-10-07 08:08:44
+Session: Array
+(
+    [user_logged_in] => 1
+    [user_id] => 9
+    [user_email] => d4niel.ap@gmail.com
+    [user_name] => Daniel Alexander
+    [user_phone] => 081914212121
+    [user_address] => 
+    [user_type] => customer
+    [user_location_id] => 
+)
+
+POST Data: Array
+(
+)
+
+ERROR: Not POST request
+=== NEW REQUEST ===
+2025-10-07 08:09:46
+Session: Array
+(
+    [user_logged_in] => 1
+    [user_id] => 9
+    [user_email] => d4niel.ap@gmail.com
+    [user_name] => Daniel Alexander
+    [user_phone] => 081914212121
+    [user_address] => 
+    [user_type] => customer
+    [user_location_id] => 
+)
+
+POST Data: Array
+(
+    [device_type] => laptop
+    [issue_type] => Layar mati
+    [brand] => ASUS
+    [model] => ROG Test
+    [serial_number] => TEST123
+    [additional_notes] => Test manual form
+)
+
+POST request received
+Device: laptop, Issue: Layar mati, Brand: ASUS, Model: ROG Test
+Database connected
+Order number generated: SRV-000005
+Executing INSERT query...
+Order inserted successfully! Order ID: 11
+Timeline inserted
+Costs inserted
+SUCCESS! Redirecting...
+
+=== NEW REQUEST ===
+2025-10-07 08:30:19
+Session: Array
+(
+    [user_logged_in] => 1
+    [user_id] => 9
+    [user_email] => d4niel.ap@gmail.com
+    [user_name] => Daniel Alexander
+    [user_phone] => 081914212121
+    [user_address] => 
+    [user_type] => customer
+    [user_location_id] => 
+)
+
+POST Data: Array
+(
+    [device_display] => Printer
+    [issue_display] => Paper jam
+    [brand] => CANON
+    [model] => CANON_DAN
+    [serial_number] => TES1234
+    [additional_notes] => 
+    [device_type] => printer
+    [issue_type] => Paper jam
+)
+
+POST request received
+Device: printer, Issue: Paper jam, Brand: CANON, Model: CANON_DAN
+Database connected
+Order number generated: SRV-000006
+Executing INSERT query...
+Order inserted successfully! Order ID: 12
+Timeline inserted
+Costs inserted
+SUCCESS! Redirecting...
+
+=== NEW REQUEST ===
+2025-10-08 07:21:27
+Session: Array
+(
+    [user_logged_in] => 1
+    [user_id] => 9
+    [user_email] => d4niel.ap@gmail.com
+    [user_name] => Daniel Alexander
+    [user_phone] => 081914212121
+    [user_address] => 
+    [user_type] => customer
+    [user_location_id] => 
+)
+
+POST Data: Array
+(
+    [device_display] => Laptop
+    [issue_display] => Layar mati / tidak menyala
+    [brand] => ASUS
+    [model] => ASUS TUF GAMING FX404
+    [serial_number] => 1231
+    [additional_notes] => 
+    [device_type] => laptop
+    [issue_type] => Layar mati / tidak menyala
+)
+
+POST request received
+Device: laptop, Issue: Layar mati / tidak menyala, Brand: ASUS, Model: ASUS TUF GAMING FX404
+Database connected
+Order number generated: SRV-000007
+Executing INSERT query...
+Order inserted successfully! Order ID: 13
+Timeline inserted
+Costs inserted
+SUCCESS! Redirecting...
+
+=== NEW REQUEST ===
+2025-10-09 14:36:42
+Session: Array
+(
+    [user_logged_in] => 1
+    [user_id] => 9
+    [user_email] => d4niel.ap@gmail.com
+    [user_name] => Daniel Alexander
+    [user_phone] => 081914212121
+    [user_address] => 
+    [user_type] => customer
+    [user_location_id] => 
+)
+
+POST Data: Array
+(
+    [device_display] => Laptop
+    [issue_display] => Refresh rate tidak bisa lebih dari 144
+    [brand] => ASUS
+    [model] => ASUS TUF GAMING  FX111
+    [serial_number] => 1231234
+    [additional_notes] => 
+    [device_type] => laptop
+    [issue_type] => Refresh rate tidak bisa lebih dari 144
+)
+
+POST request received
+Device: laptop, Issue: Refresh rate tidak bisa lebih dari 144, Brand: ASUS, Model: ASUS TUF GAMING  FX111
+Database connected
+Order number generated: SRV-000008
+Executing INSERT query...
+Order inserted successfully! Order ID: 14
+Timeline inserted
+Costs inserted
+SUCCESS! Redirecting...
+
