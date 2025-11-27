@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../config/database.php';
+require_once '../config/init_permissions.php';
 
 header('Content-Type: application/json');
 
@@ -89,6 +90,15 @@ try {
         $msg_stmt->bindParam(':receiver_id', $order['user_id']);
         $msg_stmt->bindParam(':message', $notification_message);
         $msg_stmt->execute();
+    }
+
+    // Log activity
+    require_once '../includes/ActivityLogger.php';
+    try {
+        $logger = new ActivityLogger($conn, $_SESSION['user_id']);
+        $logger->logOrderUpdate($order_id, $old_status, $new_status);
+    } catch (Exception $e) {
+        error_log("Activity logging error: " . $e->getMessage());
     }
 
     $conn->commit();

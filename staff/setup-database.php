@@ -5,6 +5,7 @@
  */
 
 require_once '../config/database.php';
+require_once '../config/init_permissions.php';
 
 header('Content-Type: text/html; charset=utf-8');
 

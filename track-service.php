@@ -205,19 +205,19 @@ function getStatusText($status) {
                             <div class="cost-breakdown">
                                 <div class="cost-item">
                                     <span>Spare Parts</span>
-                                    <span><?php echo formatRupiah($costs['spareparts_cost']); ?></span>
+                                    <span><?php echo formatRupiah($costs['parts_cost'] ?? 0); ?></span>
                                 </div>
                                 <div class="cost-item">
                                     <span>Servis & Perbaikan</span>
-                                    <span><?php echo formatRupiah($costs['service_cost']); ?></span>
+                                    <span><?php echo formatRupiah($costs['service_cost'] ?? 0); ?></span>
                                 </div>
                                 <div class="cost-item">
                                     <span>Lainnya</span>
-                                    <span><?php echo formatRupiah($costs['other_cost']); ?></span>
+                                    <span><?php echo formatRupiah($costs['other_costs'] ?? 0); ?></span>
                                 </div>
                                 <div class="cost-total">
                                     <span><strong>Total</strong></span>
-                                    <span><strong><?php echo formatRupiah($costs['total_cost']); ?></strong></span>
+                                    <span><strong><?php echo formatRupiah($costs['total_cost'] ?? 0); ?></strong></span>
                                 </div>
                             </div>
                         </div>

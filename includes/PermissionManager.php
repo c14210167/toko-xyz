@@ -1,9 +1,15 @@
 <?php
+/**
+ * Permission Manager Class (Updated for RBAC)
+ * Compatible with old code while supporting new RBAC system
+ */
+
 class PermissionManager {
     private $conn;
     private $user_id;
     private $permissions_cache = null;
-    
+    private $roles_cache = null;
+
     public function __construct($db_connection, $user_id) {
         $this->conn = $db_connection;
         $this->user_id = $user_id;
@@ -45,49 +51,39 @@ class PermissionManager {
     }
     
     /**
-     * Load all permissions for user
+     * Load all permissions for user (Updated for RBAC)
      */
     private function loadPermissions() {
         $this->permissions_cache = [];
-        
-        // Get user info
-        $user_query = "SELECT user_type, has_custom_permissions FROM users WHERE user_id = :user_id";
-        $user_stmt = $this->conn->prepare($user_query);
-        $user_stmt->bindParam(':user_id', $this->user_id);
-        $user_stmt->execute();
-        $user = $user_stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if (!$user) {
-            return;
-        }
-        
-        // Owner has all permissions
-        if ($user['user_type'] == 'owner') {
-            $all_perms_query = "SELECT permission_key FROM permissions";
-            $all_perms_stmt = $this->conn->prepare($all_perms_query);
-            $all_perms_stmt->execute();
-            while ($row = $all_perms_stmt->fetch(PDO::FETCH_ASSOC)) {
-                $this->permissions_cache[] = $row['permission_key'];
+
+        // First, check if user is owner - owners get ALL permissions
+        try {
+            $user_query = "SELECT user_type FROM users WHERE user_id = :user_id";
+            $user_stmt = $this->conn->prepare($user_query);
+            $user_stmt->bindParam(':user_id', $this->user_id);
+            $user_stmt->execute();
+            $user = $user_stmt->fetch(PDO::FETCH_ASSOC);
+
+            // If owner, grant ALL permissions automatically
+            if ($user && $user['user_type'] == 'owner') {
+                $this->permissions_cache = [
+                    'view_dashboard', 'view_orders', 'create_orders', 'edit_orders', 'delete_orders',
+                    'view_customers', 'create_customers', 'edit_customers', 'delete_customers',
+                    'view_inventory', 'create_inventory', 'edit_inventory', 'delete_inventory',
+                    'record_inventory_transaction', 'view_inventory_transactions',
+                    'view_products', 'create_products', 'edit_products', 'delete_products',
+                    'view_sales', 'view_expenses', 'view_reports',
+                    'manage_permissions', 'manage_roles', 'manage_employees', 'manage_locations',
+                    'view_suppliers', 'create_suppliers', 'edit_suppliers', 'delete_suppliers'
+                ];
+                return; // Skip RBAC lookup for owners
             }
-            return;
+        } catch (PDOException $e) {
+            // Continue with RBAC lookup if user check fails
         }
-        
-        // If user has custom permissions, use those
-        if ($user['has_custom_permissions']) {
-            $custom_query = "SELECT p.permission_key, up.is_granted
-                           FROM user_permissions up
-                           JOIN permissions p ON up.permission_id = p.permission_id
-                           WHERE up.user_id = :user_id";
-            $custom_stmt = $this->conn->prepare($custom_query);
-            $custom_stmt->bindParam(':user_id', $this->user_id);
-            $custom_stmt->execute();
-            
-            while ($row = $custom_stmt->fetch(PDO::FETCH_ASSOC)) {
-                if ($row['is_granted']) {
-                    $this->permissions_cache[] = $row['permission_key'];
-                }
-            }
-        } else {
+
+        // For non-owners, load permissions from RBAC
+        try {
             // Get permissions from roles
             $role_query = "SELECT DISTINCT p.permission_key
                           FROM user_roles ur
@@ -97,10 +93,35 @@ class PermissionManager {
             $role_stmt = $this->conn->prepare($role_query);
             $role_stmt->bindParam(':user_id', $this->user_id);
             $role_stmt->execute();
-            
+
             while ($row = $role_stmt->fetch(PDO::FETCH_ASSOC)) {
                 $this->permissions_cache[] = $row['permission_key'];
             }
+
+            // Get user-specific permission overrides
+            $override_query = "SELECT p.permission_key, up.is_granted
+                              FROM user_permissions up
+                              JOIN permissions p ON up.permission_id = p.permission_id
+                              WHERE up.user_id = :user_id";
+            $override_stmt = $this->conn->prepare($override_query);
+            $override_stmt->bindParam(':user_id', $this->user_id);
+            $override_stmt->execute();
+
+            while ($row = $override_stmt->fetch(PDO::FETCH_ASSOC)) {
+                if ($row['is_granted'] == 1) {
+                    // Add permission if granted
+                    if (!in_array($row['permission_key'], $this->permissions_cache)) {
+                        $this->permissions_cache[] = $row['permission_key'];
+                    }
+                } else {
+                    // Remove permission if revoked
+                    $this->permissions_cache = array_diff($this->permissions_cache, [$row['permission_key']]);
+                }
+            }
+
+        } catch (PDOException $e) {
+            // If RBAC tables don't exist, permissions remain empty array
+            error_log("RBAC Error: " . $e->getMessage());
         }
     }
     
@@ -118,13 +139,114 @@ class PermissionManager {
      * Get user roles
      */
     public function getUserRoles() {
-        $query = "SELECT r.* FROM user_roles ur
-                 JOIN roles r ON ur.role_id = r.role_id
-                 WHERE ur.user_id = :user_id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':user_id', $this->user_id);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if ($this->roles_cache !== null) {
+            return $this->roles_cache;
+        }
+
+        try {
+            $query = "SELECT r.* FROM user_roles ur
+                     JOIN roles r ON ur.role_id = r.role_id
+                     WHERE ur.user_id = :user_id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':user_id', $this->user_id);
+            $stmt->execute();
+            $this->roles_cache = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            $this->roles_cache = [];
+        }
+
+        return $this->roles_cache;
+    }
+
+    /**
+     * Check if user has a specific role
+     */
+    public function hasRole($roleName) {
+        $roles = $this->getUserRoles();
+        foreach ($roles as $role) {
+            if ($role['role_name'] === $roleName) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check if user is Owner
+     */
+    public function isOwner() {
+        return $this->hasRole('Owner');
+    }
+
+    /**
+     * Check if user is Manager
+     */
+    public function isManager() {
+        return $this->hasRole('Manager');
+    }
+
+    /**
+     * Check if user is Technician
+     */
+    public function isTechnician() {
+        return $this->hasRole('Technician');
+    }
+
+    /**
+     * Check if user is Cashier
+     */
+    public function isCashier() {
+        return $this->hasRole('Cashier');
+    }
+
+    /**
+     * Check permission and redirect if not authorized
+     */
+    public function requirePermission($permissionKey, $redirectUrl = '../index.php') {
+        if (!$this->hasPermission($permissionKey)) {
+            $_SESSION['error'] = 'You do not have permission to access this resource.';
+            header("Location: $redirectUrl");
+            exit();
+        }
+    }
+
+    /**
+     * Check any permission and redirect if not authorized
+     */
+    public function requireAnyPermission($permissionKeys, $redirectUrl = '../index.php') {
+        if (!$this->hasAnyPermission($permissionKeys)) {
+            $_SESSION['error'] = 'You do not have permission to access this resource.';
+            header("Location: $redirectUrl");
+            exit();
+        }
+    }
+
+    /**
+     * Get permissions grouped by category
+     */
+    public function getPermissionsByCategory() {
+        $this->loadPermissions();
+        $grouped = [];
+
+        try {
+            $query = "SELECT p.permission_key, p.permission_name, p.category
+                     FROM permissions p
+                     WHERE p.permission_key IN ('" . implode("','", $this->permissions_cache) . "')";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $category = $row['category'] ?? 'other';
+                if (!isset($grouped[$category])) {
+                    $grouped[$category] = [];
+                }
+                $grouped[$category][$row['permission_key']] = $row['permission_name'];
+            }
+        } catch (PDOException $e) {
+            // Ignore if permissions table doesn't exist
+        }
+
+        return $grouped;
     }
 }
 ?>

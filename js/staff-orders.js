@@ -158,6 +158,9 @@ function renderOrders(orders) {
                     <button class="btn-action btn-view" onclick="viewOrderDetail(${order.order_id})" title="View Details">
                         👁️
                     </button>
+                    <button class="btn-action btn-edit" onclick="openEditOrderModal(${order.order_id})" title="Edit Order" style="background: #059669; color: white;">
+                        ✏️
+                    </button>
                     <button class="btn-action btn-chat" onclick="openChat(${order.order_id}, ${order.customer_id}, '${escapeHtml(order.customer_name)}', '${order.order_number}')" title="Chat">
                         💬
                     </button>
@@ -263,7 +266,7 @@ async function viewOrderDetail(orderId) {
     orderModal.style.display = 'block';
 
     try {
-        const response = await fetch(`../api/get-order-detail.php?order_id=${orderId}`);
+        const response = await fetch(`../staff/api/get-order-detail.php?order_id=${orderId}`);
         const data = await response.json();
 
         if (data.success) {

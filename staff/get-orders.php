@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../config/database.php';
+require_once '../config/init_permissions.php';
 
 // Clean output buffer to prevent any unwanted output
 if (ob_get_level()) ob_clean();

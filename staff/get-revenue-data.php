@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../config/database.php';
+require_once '../config/init_permissions.php';
 
 header('Content-Type: application/json');
 

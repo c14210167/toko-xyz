@@ -9,7 +9,8 @@
 }
 
 .search-box {
-    margin-bottom: 1rem;
+    flex: 1;
+    margin-bottom: 0;
 }
 
 .search-box input {
@@ -19,6 +20,24 @@
     border-radius: 8px;
     font-size: 0.95rem;
     transition: all 0.3s;
+}
+
+/* Search + Button Row */
+.search-filter-section > .search-box,
+.search-filter-section > .btn {
+    display: inline-block;
+}
+
+.search-filter-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.search-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
 }
 
 .search-box input:focus {

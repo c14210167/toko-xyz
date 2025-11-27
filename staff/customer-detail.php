@@ -2,6 +2,7 @@
 session_start();
 require_once '../config/database.php';
 require_once '../includes/PermissionManager.php';
+require_once '../config/init_permissions.php';
 
 // Check if logged in and staff/owner
 if (!isset($_SESSION['user_logged_in']) || !$_SESSION['user_logged_in']) {
@@ -133,14 +134,50 @@ $status_config = [
                 <span class="nav-icon">📦</span>
                 <span class="nav-text">Inventory</span>
             </a>
+            <a href="inventory-taking.php" class="nav-item">
+                <span class="nav-icon">📋</span>
+                <span class="nav-text">Inventory Taking</span>
+            </a>
+            <a href="suppliers.php" class="nav-item">
+                <span class="nav-icon">🏢</span>
+                <span class="nav-text">Suppliers</span>
+            </a>
+            <?php if (hasPermission('manage_roles') || hasPermission('manage_permissions')): ?>
+            <a href="employees.php" class="nav-item">
+                <span class="nav-icon">👨‍💼</span>
+                <span class="nav-text">Manage Employees</span>
+            </a>
+            <a href="locations.php" class="nav-item">
+                <span class="nav-icon">📍</span>
+                <span class="nav-text">Manage Locations</span>
+            </a>
+            <a href="roles.php" class="nav-item">
+                <span class="nav-icon">🔑</span>
+                <span class="nav-text">Manage Roles</span>
+            </a>
+            <a href="activities.php" class="nav-item">
+                <span class="nav-icon">📋</span>
+                <span class="nav-text">Activity Logs</span>
+            </a>
+            <?php endif; ?>
+            <?php if (hasPermission('view_products')): ?>
+            <a href="products.php" class="nav-item">
+                <span class="nav-icon">🛍️</span>
+                <span class="nav-text">Products</span>
+            </a>
+            <?php endif; ?>
+            <?php if (hasPermission('view_sales')): ?>
+            <a href="sales.php" class="nav-item">
+                <span class="nav-icon">💰</span>
+                <span class="nav-text">Sales</span>
+            </a>
+            <?php endif; ?>
+            <?php if (hasPermission('view_reports')): ?>
             <a href="reports.php" class="nav-item">
                 <span class="nav-icon">📈</span>
                 <span class="nav-text">Reports</span>
             </a>
-            <a href="settings.php" class="nav-item">
-                <span class="nav-icon">⚙️</span>
-                <span class="nav-text">Settings</span>
-            </a>
+            <?php endif; ?>
         </nav>
 
         <div class="sidebar-footer">

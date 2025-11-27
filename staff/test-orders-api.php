@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once '../config/init_permissions.php';
 
 // Simulate logged in staff user for testing
 if (!isset($_SESSION['user_logged_in'])) {

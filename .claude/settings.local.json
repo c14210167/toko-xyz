@@ -1,7 +1,20 @@
 {
   "permissions": {
     "allow": [
-      "Bash(mysql:*)"
+      "Bash(mysql:*)",
+      "Bash(dir:*)",
+      "Bash(nul)",
+      "Bash(if not exist \"d:\\XAMPP\\htdocs\\frontendproject\\staff\\includes\" mkdir \"d:\\XAMPP\\htdocs\\frontendproject\\staff\\includes\")",
+      "Bash(tree:*)",
+      "Bash(find:*)",
+      "Bash(composer install:*)",
+      "Bash(copy .env.example .env)",
+      "Bash(php artisan:*)",
+      "Bash(findstr:*)",
+      "Bash(tasklist:*)",
+      "Bash(composer dump-autoload:*)",
+      "Bash(if not exist \"d:\\XAMPP\\htdocs\\frontendproject\\laravel-mode\\public\\css\" mkdir \"d:\\XAMPP\\htdocs\\frontendproject\\laravel-mode\\public\\css\")",
+      "Bash(if not exist \"d:\\XAMPP\\htdocs\\frontendproject\\laravel-mode\\public\\js\" mkdir \"d:\\XAMPP\\htdocs\\frontendproject\\laravel-mode\\public\\js\")"
     ],
     "deny": [],
     "ask": []

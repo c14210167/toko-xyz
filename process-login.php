@@ -29,7 +29,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['user_address'] = $user['address'];
             $_SESSION['user_type'] = $user['user_type'];
             $_SESSION['user_location_id'] = $user['location_id'];
-            
+
+            // Log login activity (only for staff/owner, not customers)
+            if ($user['user_type'] != 'customer') {
+                require_once 'includes/ActivityLogger.php';
+                try {
+                    $logger = new ActivityLogger($conn, $user['user_id']);
+                    $logger->logLogin();
+                } catch (Exception $e) {
+                    error_log("Login logging error: " . $e->getMessage());
+                }
+            }
+
             // Redirect berdasarkan user type
             if ($user['user_type'] == 'customer') {
                 header('Location: index.php');
