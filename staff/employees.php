@@ -2,6 +2,7 @@
 session_start();
 require_once '../config/database.php';
 require_once '../includes/PermissionManager.php';
+require_once '../config/init_permissions.php';
 
 // Check if logged in
 if (!isset($_SESSION['user_logged_in']) || !$_SESSION['user_logged_in']) {
@@ -20,6 +21,9 @@ $permissionManager->requireAnyPermission(['manage_roles', 'manage_permissions'],
 $roles = $permissionManager->getUserRoles();
 $role_names = array_map(function($role) { return $role['role_name']; }, $roles);
 $primary_role = !empty($role_names) ? $role_names[0] : 'Staff';
+
+// Check if current user is owner
+$is_owner = $_SESSION['user_type'] == 'owner';
 
 // Get all roles for filter dropdown
 $all_roles_query = "SELECT role_id, role_name FROM roles WHERE role_name != 'Customer' ORDER BY role_name";
@@ -55,6 +59,14 @@ $all_roles = $all_roles_stmt->fetchAll(PDO::FETCH_ASSOC);
                 <span class="nav-icon">📊</span>
                 <span class="nav-text">Dashboard</span>
             </a>
+            <a href="pos.php" class="nav-item">
+                <span class="nav-icon">💳</span>
+                <span class="nav-text">Point of Sale</span>
+            </a>
+            <a href="session-history.php" class="nav-item">
+                <span class="nav-icon">📜</span>
+                <span class="nav-text">Session History</span>
+            </a>
             <a href="orders.php" class="nav-item">
                 <span class="nav-icon">🔧</span>
                 <span class="nav-text">Orders</span>
@@ -75,6 +87,7 @@ $all_roles = $all_roles_stmt->fetchAll(PDO::FETCH_ASSOC);
                 <span class="nav-icon">🏢</span>
                 <span class="nav-text">Suppliers</span>
             </a>
+            <?php if (hasPermission('manage_roles') || hasPermission('manage_permissions')): ?>
             <a href="employees.php" class="nav-item active">
                 <span class="nav-icon">👨‍💼</span>
                 <span class="nav-text">Manage Employees</span>
@@ -91,6 +104,19 @@ $all_roles = $all_roles_stmt->fetchAll(PDO::FETCH_ASSOC);
                 <span class="nav-icon">📋</span>
                 <span class="nav-text">Activity Logs</span>
             </a>
+            <?php endif; ?>
+            <?php if (hasPermission('view_sales')): ?>
+            <a href="sales.php" class="nav-item">
+                <span class="nav-icon">💰</span>
+                <span class="nav-text">Sales</span>
+            </a>
+            <?php endif; ?>
+            <?php if (hasPermission('view_reports')): ?>
+            <a href="reports.php" class="nav-item">
+                <span class="nav-icon">📈</span>
+                <span class="nav-text">Reports</span>
+            </a>
+            <?php endif; ?>
         </nav>
 
         <div class="sidebar-footer">
@@ -109,41 +135,125 @@ $all_roles = $all_roles_stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="main-content">
         <div class="top-bar">
             <h1>Manage Employees</h1>
-            <div class="top-bar-actions">
-                <div class="search-box">
-                    <input type="text" id="searchEmployee" placeholder="Search employees..." />
-                    <span class="search-icon">🔍</span>
-                </div>
-            </div>
         </div>
 
         <div class="content-area">
-            <!-- Filter Section -->
-            <div class="filter-section">
-                <div class="filter-group">
-                    <label>Filter by Role:</label>
-                    <select id="roleFilter">
-                        <option value="all">All Roles</option>
-                        <?php foreach ($all_roles as $role): ?>
-                            <option value="<?php echo htmlspecialchars($role['role_name']); ?>">
-                                <?php echo htmlspecialchars($role['role_name']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+            <!-- Search and Filter Section -->
+            <div class="search-filter-section">
+                <div class="search-box">
+                    <input type="text" id="searchEmployee" placeholder="🔍 Search employees by name or email..." />
                 </div>
-                <div class="filter-group">
-                    <label>Filter by Status:</label>
-                    <select id="statusFilter">
-                        <option value="all">All Status</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
+
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label>Filter by Role:</label>
+                        <select id="roleFilter">
+                            <option value="all">All Roles</option>
+                            <?php foreach ($all_roles as $role): ?>
+                                <option value="<?php echo htmlspecialchars($role['role_name']); ?>">
+                                    <?php echo htmlspecialchars($role['role_name']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Filter by Status:</label>
+                        <select id="statusFilter">
+                            <option value="all">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="showAddEmployeeModal()">
+                        + Add New Employee
+                    </button>
                 </div>
             </div>
 
             <!-- Employee Cards -->
             <div class="employee-grid" id="employeeGrid">
                 <div class="loading-spinner">Loading employees...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Employee Modal -->
+    <div id="employeeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Employee</h2>
+                <button class="btn-close" onclick="closeEmployeeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="employeeForm">
+                    <input type="hidden" id="employeeId" name="employee_id">
+
+                    <div class="form-group">
+                        <label for="firstName">First Name <span class="required">*</span></label>
+                        <input type="text" id="firstName" name="first_name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName">Last Name <span class="required">*</span></label>
+                        <input type="text" id="lastName" name="last_name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email <span class="required">*</span></label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number <span class="required">*</span></label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+
+                    <div class="form-group" id="passwordGroup">
+                        <label for="password">Password <span class="required">*</span></label>
+                        <input type="password" id="password" name="password" required>
+                        <small>Minimum 6 characters</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <textarea id="address" name="address" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Role <span class="required">*</span></label>
+                        <div class="radio-group" id="roleRadioGroup">
+                            <?php foreach ($all_roles as $role): ?>
+                                <?php
+                                // Only owners can assign Owner role
+                                if ($role['role_name'] == 'Owner' && !$is_owner) {
+                                    continue; // Skip Owner role for non-owners
+                                }
+                                ?>
+                            <div class="radio-item">
+                                <input
+                                    type="radio"
+                                    id="role_<?php echo $role['role_id']; ?>"
+                                    name="role_id"
+                                    value="<?php echo $role['role_id']; ?>"
+                                    required
+                                >
+                                <label for="role_<?php echo $role['role_id']; ?>">
+                                    <?php echo htmlspecialchars($role['role_name']); ?>
+                                </label>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <?php if (!$is_owner): ?>
+                        <small style="color: #64748b; margin-top: 0.5rem; display: block;">
+                            Note: Only owners can assign the Owner role
+                        </small>
+                        <?php endif; ?>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeEmployeeModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveEmployee()">Save Employee</button>
             </div>
         </div>
     </div>

@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once '../config/database.php';
+require_once '../includes/PermissionManager.php';
 require_once '../config/init_permissions.php';
 
 // Check permission
@@ -12,18 +14,14 @@ if (!hasPermission('view_inventory')) {
 $user_name = $_SESSION['user_name'] ?? 'User';
 
 // Get locations for dropdown
-require_once '../config/database.php';
 $database = new Database();
 $conn = $database->getConnection();
 
-// Determine primary role
-if ($_SESSION['user_type'] == 'owner') {
-    $primary_role = 'Owner';
-} else {
-    $roles = $permissionManager->getUserRoles();
-    $role_names = array_map(function($role) { return $role['role_name']; }, $roles);
-    $primary_role = !empty($role_names) ? $role_names[0] : 'Staff';
-}
+// Get user roles
+$permissionManager = new PermissionManager($conn, $_SESSION['user_id']);
+$roles = $permissionManager->getUserRoles();
+$role_names = array_map(function($role) { return $role['role_name']; }, $roles);
+$primary_role = !empty($role_names) ? $role_names[0] : 'Staff';
 
 $loc_query = "SELECT * FROM locations ORDER BY name";
 $loc_stmt = $conn->prepare($loc_query);
@@ -74,6 +72,14 @@ $motivational_quotes = [
                     <span class="nav-icon">📊</span>
                     <span class="nav-text">Dashboard</span>
                 </a>
+                <a href="pos.php" class="nav-item">
+                    <span class="nav-icon">💳</span>
+                    <span class="nav-text">Point of Sale</span>
+                </a>
+            <a href="session-history.php" class="nav-item">
+                <span class="nav-icon">📜</span>
+                <span class="nav-text">Session History</span>
+            </a>
                 <a href="orders.php" class="nav-item">
                     <span class="nav-icon">🔧</span>
                     <span class="nav-text">Orders</span>
@@ -110,6 +116,18 @@ $motivational_quotes = [
                 <a href="activities.php" class="nav-item">
                     <span class="nav-icon">📋</span>
                     <span class="nav-text">Activity Logs</span>
+                </a>
+                <?php endif; ?>
+                <?php if (hasPermission('view_sales')): ?>
+                <a href="sales.php" class="nav-item">
+                    <span class="nav-icon">💰</span>
+                    <span class="nav-text">Sales</span>
+                </a>
+                <?php endif; ?>
+                <?php if (hasPermission('view_reports')): ?>
+                <a href="reports.php" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Reports</span>
                 </a>
                 <?php endif; ?>
             </nav>

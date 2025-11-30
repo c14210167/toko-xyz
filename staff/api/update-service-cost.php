@@ -35,6 +35,7 @@ try {
 
     $order_id = intval($data['order_id']);
     $service_cost = floatval($data['service_cost']);
+    $discount = isset($data['discount']) ? floatval($data['discount']) : 0;
 
     // Check if order exists
     $check_query = "SELECT order_id FROM orders WHERE order_id = :order_id";
@@ -54,19 +55,22 @@ try {
     $cost_stmt->execute();
     $current_costs = $cost_stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Calculate new total
+    // Calculate new total (subtract discount from total)
     $parts_cost = $current_costs['parts_cost'] ?? 0;
     $other_costs = $current_costs['other_costs'] ?? 0;
-    $new_total = $service_cost + $parts_cost + $other_costs;
+    $subtotal = $service_cost + $parts_cost + $other_costs;
+    $new_total = max(0, $subtotal - $discount); // Ensure total cannot be negative
 
-    // Update service cost
+    // Update service cost and discount
     $update_query = "UPDATE order_costs
                     SET service_cost = :service_cost,
+                        discount = :discount,
                         total_cost = :total_cost
                     WHERE order_id = :order_id";
 
     $update_stmt = $conn->prepare($update_query);
     $update_stmt->bindParam(':service_cost', $service_cost);
+    $update_stmt->bindParam(':discount', $discount);
     $update_stmt->bindParam(':total_cost', $new_total);
     $update_stmt->bindParam(':order_id', $order_id);
     $update_stmt->execute();

@@ -43,7 +43,7 @@ if (isEmployeeListPage) {
         }
 
         grid.innerHTML = employees.map(emp => `
-            <div class="employee-card" onclick="window.location.href='employee-detail.php?id=${emp.user_id}'">
+            <div class="employee-card" onclick="showEditEmployeeModal(${emp.user_id})">
                 <div class="employee-card-header">
                     <div class="employee-avatar">${emp.avatar}</div>
                     <div class="employee-info">
@@ -109,109 +109,160 @@ if (isEmployeeListPage) {
 }
 
 // ========================================
-// EMPLOYEE DETAIL PAGE
+// EMPLOYEE DETAIL PAGE (DEPRECATED - Using Modal Instead)
 // ========================================
 if (isEmployeeDetailPage) {
-    let currentRoles = [];
-    let allRoles = [];
+    // This section is no longer used - employee editing is done via modal
+    console.log('Employee detail page detected but using modal-based editing');
+}
 
-    document.addEventListener('DOMContentLoaded', () => {
-        loadEmployeeRoles();
-        setupSaveButton();
-    });
+// ========================================
+// MODAL FUNCTIONS (GLOBAL)
+// ========================================
+function showAddEmployeeModal() {
+    const modal = document.getElementById('employeeModal');
+    const form = document.getElementById('employeeForm');
+    const modalTitle = document.getElementById('modalTitle');
+    const passwordGroup = document.getElementById('passwordGroup');
 
-    async function loadEmployeeRoles() {
-        try {
-            const response = await fetch(`api/get-employee-detail.php?id=${employeeId}`);
-            const data = await response.json();
+    // Reset form
+    form.reset();
+    document.getElementById('employeeId').value = '';
 
-            if (data.error) {
-                showError(data.error);
-                return;
-            }
+    // Set title and show password field
+    modalTitle.textContent = 'Add New Employee';
+    passwordGroup.style.display = 'block';
+    document.getElementById('password').required = true;
 
-            currentRoles = data.current_roles;
-            allRoles = data.all_roles;
+    // Show modal
+    modal.style.display = 'flex';
+}
 
-            displayCurrentRoles(currentRoles);
-            displayAvailableRoles(allRoles);
-        } catch (error) {
-            showError('Failed to load employee roles');
-            console.error(error);
-        }
-    }
+async function showEditEmployeeModal(employeeId) {
+    const modal = document.getElementById('employeeModal');
+    const form = document.getElementById('employeeForm');
+    const modalTitle = document.getElementById('modalTitle');
+    const passwordGroup = document.getElementById('passwordGroup');
 
-    function displayCurrentRoles(roles) {
-        const container = document.getElementById('currentRolesList');
+    try {
+        // Fetch employee data
+        const response = await fetch(`api/get-employee-info.php?id=${employeeId}`);
+        const data = await response.json();
 
-        if (roles.length === 0) {
-            container.innerHTML = '<p class="no-data">No roles assigned</p>';
+        if (data.error) {
+            showError(data.error);
             return;
         }
 
-        container.innerHTML = roles.map(role => `
-            <div class="role-badge ${role.is_system_role ? 'system-role' : ''}">
-                <span>${escapeHtml(role.role_name)}</span>
-                ${role.is_system_role ? '<span title="System Role">🔒</span>' : ''}
-            </div>
-        `).join('');
-    }
-
-    function displayAvailableRoles(roles) {
-        const container = document.getElementById('availableRolesList');
-
-        container.innerHTML = roles.map(role => `
-            <div class="checkbox-item">
-                <input
-                    type="checkbox"
-                    id="role_${role.role_id}"
-                    value="${role.role_id}"
-                    ${role.is_assigned ? 'checked' : ''}
-                >
-                <label for="role_${role.role_id}" class="checkbox-label">
-                    <div>${escapeHtml(role.role_name)}</div>
-                    ${role.description ? `<div class="checkbox-description">${escapeHtml(role.description)}</div>` : ''}
-                </label>
-            </div>
-        `).join('');
-    }
-
-    function setupSaveButton() {
-        const saveButton = document.getElementById('btnSaveRoles');
-        saveButton.addEventListener('click', saveEmployeeRoles);
-    }
-
-    async function saveEmployeeRoles() {
-        const checkboxes = document.querySelectorAll('#availableRolesList input[type="checkbox"]:checked');
-        const roleIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
-
-        try {
-            const response = await fetch('api/update-employee-roles.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    employee_id: employeeId,
-                    role_ids: roleIds
-                })
-            });
-
-            const data = await response.json();
-
-            if (data.error) {
-                showError(data.error);
-                return;
-            }
-
-            showSuccess('Employee roles updated successfully');
-            setTimeout(() => {
-                loadEmployeeRoles();
-            }, 1000);
-        } catch (error) {
-            showError('Failed to update employee roles');
-            console.error(error);
+        // Additional check: warn if trying to edit owner as non-owner
+        if (data.employee.user_type === 'owner' && data.current_user_type !== 'owner') {
+            showError('Only owners can edit other owner accounts');
+            return;
         }
+
+        // Fill form
+        document.getElementById('employeeId').value = data.employee.user_id;
+        document.getElementById('firstName').value = data.employee.first_name;
+        document.getElementById('lastName').value = data.employee.last_name;
+        document.getElementById('email').value = data.employee.email;
+        document.getElementById('phone').value = data.employee.phone || '';
+        document.getElementById('address').value = data.employee.address || '';
+
+        // Select the role radio button
+        if (data.employee.role_id) {
+            const roleRadio = document.getElementById(`role_${data.employee.role_id}`);
+            if (roleRadio) {
+                roleRadio.checked = true;
+            }
+        }
+
+        // Set title and hide password field for edit
+        modalTitle.textContent = 'Edit Employee';
+        passwordGroup.style.display = 'none';
+        document.getElementById('password').required = false;
+
+        // Show modal
+        modal.style.display = 'flex';
+
+    } catch (error) {
+        showError('Failed to load employee data');
+        console.error(error);
+    }
+}
+
+function closeEmployeeModal() {
+    const modal = document.getElementById('employeeModal');
+    modal.style.display = 'none';
+}
+
+async function saveEmployee() {
+    const form = document.getElementById('employeeForm');
+
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    const employeeId = document.getElementById('employeeId').value;
+    const formData = {
+        employee_id: employeeId || null,
+        first_name: document.getElementById('firstName').value,
+        last_name: document.getElementById('lastName').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        address: document.getElementById('address').value,
+        role_id: document.querySelector('input[name="role_id"]:checked')?.value
+    };
+
+    // Add password only if adding new employee or if password field is visible and filled
+    if (!employeeId) {
+        formData.password = document.getElementById('password').value;
+    }
+
+    try {
+        const apiUrl = employeeId ? 'api/update-employee.php' : 'api/add-employee.php';
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (data.error || !data.success) {
+            showError(data.error || data.message || 'Failed to save employee');
+            return;
+        }
+
+        showSuccess(employeeId ? 'Employee updated successfully' : 'Employee added successfully');
+        closeEmployeeModal();
+
+        // If user updated their own profile, reload page to update sidebar
+        if (data.reload_page) {
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+            return;
+        }
+
+        // Reload employees list if on list page
+        if (typeof loadEmployees === 'function') {
+            loadEmployees();
+        }
+
+    } catch (error) {
+        showError('Failed to save employee');
+        console.error(error);
+    }
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('employeeModal');
+    if (event.target === modal) {
+        closeEmployeeModal();
     }
 }
 

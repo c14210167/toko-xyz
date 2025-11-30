@@ -17,7 +17,7 @@ if (!isset($_SESSION['user_logged_in']) || !$_SESSION['user_logged_in']) {
 }
 
 // Check permission
-if (!hasPermission('view_orders')) {
+if (!hasAnyPermission(['view_all_orders', 'view_own_orders'])) {
     echo json_encode(['success' => false, 'message' => 'No permission']);
     exit();
 }
@@ -100,8 +100,10 @@ try {
     // Calculate totals
     $spareparts_total = array_sum(array_column($spareparts, 'subtotal'));
     $service_cost = $costs['service_cost'] ?? 0;
+    $discount = $costs['discount'] ?? 0;
     $custom_costs_total = array_sum(array_column($custom_costs, 'amount'));
-    $total_cost = $service_cost + $spareparts_total + $custom_costs_total;
+    $subtotal = $service_cost + $spareparts_total + $custom_costs_total;
+    $total_cost = max(0, $subtotal - $discount); // Subtract discount, ensure not negative
 
     echo json_encode([
         'success' => true,
@@ -113,6 +115,7 @@ try {
             'service_cost' => $service_cost,
             'spareparts_total' => $spareparts_total,
             'custom_costs_total' => $custom_costs_total,
+            'discount' => $discount,
             'total_cost' => $total_cost
         ]
     ]);

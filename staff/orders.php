@@ -60,6 +60,14 @@ $locations = $locations_stmt->fetchAll(PDO::FETCH_ASSOC);
                 <span class="nav-icon">📊</span>
                 <span class="nav-text">Dashboard</span>
             </a>
+            <a href="pos.php" class="nav-item">
+                <span class="nav-icon">💳</span>
+                <span class="nav-text">Point of Sale</span>
+            </a>
+            <a href="session-history.php" class="nav-item">
+                <span class="nav-icon">📜</span>
+                <span class="nav-text">Session History</span>
+            </a>
             <a href="orders.php" class="nav-item active">
                 <span class="nav-icon">🔧</span>
                 <span class="nav-text">Orders</span>
@@ -128,12 +136,6 @@ $locations = $locations_stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="main-content">
         <div class="top-bar">
             <h1>Orders Management</h1>
-            <div class="top-bar-actions">
-                <div class="notification-badge">
-                    <span class="badge-icon">🔔</span>
-                    <span class="badge-count" id="notifCount">0</span>
-                </div>
-            </div>
         </div>
 
         <div class="content-area">
@@ -428,16 +430,31 @@ $locations = $locations_stmt->fetchAll(PDO::FETCH_ASSOC);
                     <div id="orderInfoDisplay"></div>
                 </div>
 
-                <!-- Service Cost -->
+                <!-- Warranty Section -->
+                <div style="background: #f0f9ff; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #3b82f6;">
+                    <label style="display: flex; align-items: center; cursor: pointer; font-size: 16px; font-weight: 500; color: #1e293b;">
+                        <input type="checkbox" id="warrantyCheckbox" style="width: 20px; height: 20px; margin-right: 12px; cursor: pointer;" onchange="updateWarrantyStatus()">
+                        <span>✅ Warranty</span>
+                    </label>
+                    <p style="margin: 8px 0 0 32px; font-size: 13px; color: #64748b;">Check this if the order has warranty coverage</p>
+                </div>
+
+                <!-- Service Cost & Discount -->
                 <div class="cost-section">
-                    <h3>💰 Service Cost</h3>
-                    <div class="form-group">
-                        <label>Service Cost (Rp)</label>
-                        <input type="number" id="serviceCostInput" class="form-control" min="0" step="1000" placeholder="0">
-                        <button class="btn btn-primary btn-sm" onclick="updateServiceCost()" style="margin-top: 10px;">
-                            Update Service Cost
-                        </button>
+                    <h3>💰 Service Cost & Discount</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Service Cost (Rp)</label>
+                            <input type="number" id="serviceCostInput" class="form-control" min="0" step="1000" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Discount / Potongan (Rp)</label>
+                            <input type="number" id="discountInput" class="form-control" min="0" step="1000" placeholder="0">
+                        </div>
                     </div>
+                    <button class="btn btn-primary btn-sm" onclick="updateServiceCost()" style="margin-top: 10px;">
+                        Update Service Cost & Discount
+                    </button>
                 </div>
 
                 <!-- Spareparts Section -->
@@ -502,9 +519,13 @@ $locations = $locations_stmt->fetchAll(PDO::FETCH_ASSOC);
                         <span>Spareparts Total:</span>
                         <span id="summarySpareparts">Rp 0</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px solid rgba(255,255,255,0.3);">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                         <span>Custom Costs Total:</span>
                         <span id="summaryCustomCosts">Rp 0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px solid rgba(255,255,255,0.3); color: #fbbf24;">
+                        <span>Discount / Potongan:</span>
+                        <span id="summaryDiscount">- Rp 0</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; font-size: 24px; font-weight: bold;">
                         <span>TOTAL:</span>

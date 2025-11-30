@@ -2,6 +2,7 @@
 session_start();
 require_once '../config/database.php';
 require_once '../includes/PermissionManager.php';
+require_once '../config/init_permissions.php';
 
 // Check if logged in
 if (!isset($_SESSION['user_logged_in']) || !$_SESSION['user_logged_in']) {
@@ -49,6 +50,14 @@ $primary_role = !empty($role_names) ? $role_names[0] : 'Staff';
                 <span class="nav-icon">📊</span>
                 <span class="nav-text">Dashboard</span>
             </a>
+            <a href="pos.php" class="nav-item">
+                <span class="nav-icon">💳</span>
+                <span class="nav-text">Point of Sale</span>
+            </a>
+            <a href="session-history.php" class="nav-item">
+                <span class="nav-icon">📜</span>
+                <span class="nav-text">Session History</span>
+            </a>
             <a href="orders.php" class="nav-item">
                 <span class="nav-icon">🔧</span>
                 <span class="nav-text">Orders</span>
@@ -69,6 +78,7 @@ $primary_role = !empty($role_names) ? $role_names[0] : 'Staff';
                 <span class="nav-icon">🏢</span>
                 <span class="nav-text">Suppliers</span>
             </a>
+            <?php if (hasPermission('manage_roles') || hasPermission('manage_permissions')): ?>
             <a href="employees.php" class="nav-item">
                 <span class="nav-icon">👨‍💼</span>
                 <span class="nav-text">Manage Employees</span>
@@ -85,6 +95,19 @@ $primary_role = !empty($role_names) ? $role_names[0] : 'Staff';
                 <span class="nav-icon">📋</span>
                 <span class="nav-text">Activity Logs</span>
             </a>
+            <?php endif; ?>
+            <?php if (hasPermission('view_sales')): ?>
+            <a href="sales.php" class="nav-item">
+                <span class="nav-icon">💰</span>
+                <span class="nav-text">Sales</span>
+            </a>
+            <?php endif; ?>
+            <?php if (hasPermission('view_reports')): ?>
+            <a href="reports.php" class="nav-item">
+                <span class="nav-icon">📈</span>
+                <span class="nav-text">Reports</span>
+            </a>
+            <?php endif; ?>
         </nav>
 
         <div class="sidebar-footer">

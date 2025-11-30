@@ -67,14 +67,22 @@ class PermissionManager {
             // If owner, grant ALL permissions automatically
             if ($user && $user['user_type'] == 'owner') {
                 $this->permissions_cache = [
-                    'view_dashboard', 'view_orders', 'create_orders', 'edit_orders', 'delete_orders',
+                    'view_dashboard', 'view_analytics', 'view_all_orders', 'view_own_orders',
+                    'create_order', 'create_orders', 'edit_order', 'edit_orders', 'update_order_status', 'assign_technician', 'cancel_order',
+                    'access_pos', 'create_transaction', 'void_transaction', 'give_discount',
+                    'view_inventory', 'edit_inventory', 'add_product', 'transfer_stock', 'stock_opname',
+                    'view_financial_report', 'view_revenue', 'view_expenses', 'manage_expenses',
+                    'view_price_list', 'edit_price_list', 'manage_promotions',
+                    'view_staff_list', 'add_staff', 'edit_staff', 'delete_staff',
+                    'manage_roles', 'assign_roles', 'manage_permissions',
+                    'view_all_locations', 'manage_locations',
+                    'view_all_messages', 'reply_messages',
+                    'export_reports', 'view_sales_report', 'view_service_report',
                     'view_customers', 'create_customers', 'edit_customers', 'delete_customers',
-                    'view_inventory', 'create_inventory', 'edit_inventory', 'delete_inventory',
-                    'record_inventory_transaction', 'view_inventory_transactions',
                     'view_products', 'create_products', 'edit_products', 'delete_products',
-                    'view_sales', 'view_expenses', 'view_reports',
-                    'manage_permissions', 'manage_roles', 'manage_employees', 'manage_locations',
-                    'view_suppliers', 'create_suppliers', 'edit_suppliers', 'delete_suppliers'
+                    'view_sales', 'view_reports', 'manage_employees',
+                    'view_suppliers', 'create_suppliers', 'edit_suppliers', 'delete_suppliers',
+                    'record_inventory_transaction', 'view_inventory_transactions'
                 ];
                 return; // Skip RBAC lookup for owners
             }

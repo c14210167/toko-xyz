@@ -199,25 +199,39 @@ function getStatusText($status) {
                         </div>
 
                         <!-- Cost Card -->
-                        <?php if ($costs): ?>
+                        <?php if ($costs):
+                            // Calculate correct total
+                            $parts_cost = $costs['parts_cost'] ?? 0;
+                            $service_cost = $costs['service_cost'] ?? 0;
+                            $other_costs = $costs['other_costs'] ?? 0;
+                            $discount = $costs['discount'] ?? 0;
+                            $subtotal = $parts_cost + $service_cost + $other_costs;
+                            $total = max(0, $subtotal - $discount);
+                        ?>
                         <div class="info-card cost-card">
                             <h3>Rincian Biaya</h3>
                             <div class="cost-breakdown">
                                 <div class="cost-item">
                                     <span>Spare Parts</span>
-                                    <span><?php echo formatRupiah($costs['parts_cost'] ?? 0); ?></span>
+                                    <span><?php echo formatRupiah($parts_cost); ?></span>
                                 </div>
                                 <div class="cost-item">
                                     <span>Servis & Perbaikan</span>
-                                    <span><?php echo formatRupiah($costs['service_cost'] ?? 0); ?></span>
+                                    <span><?php echo formatRupiah($service_cost); ?></span>
                                 </div>
                                 <div class="cost-item">
                                     <span>Lainnya</span>
-                                    <span><?php echo formatRupiah($costs['other_costs'] ?? 0); ?></span>
+                                    <span><?php echo formatRupiah($other_costs); ?></span>
                                 </div>
+                                <?php if ($discount > 0): ?>
+                                <div class="cost-item discount-item">
+                                    <span>Potongan</span>
+                                    <span>- <?php echo formatRupiah($discount); ?></span>
+                                </div>
+                                <?php endif; ?>
                                 <div class="cost-total">
                                     <span><strong>Total</strong></span>
-                                    <span><strong><?php echo formatRupiah($costs['total_cost'] ?? 0); ?></strong></span>
+                                    <span><strong><?php echo formatRupiah($total); ?></strong></span>
                                 </div>
                             </div>
                         </div>

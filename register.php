@@ -72,14 +72,6 @@
                     </button>
                 </div>
 
-                <div class="form-options">
-                    <label class="checkbox-container">
-                        <input type="checkbox" name="terms" required>
-                        <span class="checkmark"></span>
-                        Saya setuju dengan syarat & ketentuan
-                    </label>
-                </div>
-
                 <button type="submit" class="btn-submit">
                     <span>Daftar Sekarang</span>
                     <div class="btn-shine"></div>

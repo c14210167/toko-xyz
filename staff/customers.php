@@ -120,6 +120,14 @@ $customers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <span class="nav-icon">📊</span>
                 <span class="nav-text">Dashboard</span>
             </a>
+            <a href="pos.php" class="nav-item">
+                <span class="nav-icon">💳</span>
+                <span class="nav-text">Point of Sale</span>
+            </a>
+            <a href="session-history.php" class="nav-item">
+                <span class="nav-icon">📜</span>
+                <span class="nav-text">Session History</span>
+            </a>
             <a href="orders.php" class="nav-item">
                 <span class="nav-icon">🔧</span>
                 <span class="nav-text">Orders</span>
@@ -156,12 +164,6 @@ $customers = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <a href="activities.php" class="nav-item">
                 <span class="nav-icon">📋</span>
                 <span class="nav-text">Activity Logs</span>
-            </a>
-            <?php endif; ?>
-            <?php if (hasPermission('view_products')): ?>
-            <a href="products.php" class="nav-item">
-                <span class="nav-icon">🛍️</span>
-                <span class="nav-text">Products</span>
             </a>
             <?php endif; ?>
             <?php if (hasPermission('view_sales')): ?>

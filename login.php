@@ -45,15 +45,6 @@
                     </button>
                 </div>
 
-                <div class="form-options">
-                    <label class="checkbox-container">
-                        <input type="checkbox" name="remember">
-                        <span class="checkmark"></span>
-                        Remember me
-                    </label>
-                    <a href="#" class="forgot-password">Lupa password?</a>
-                </div>
-
                 <button type="submit" class="btn-submit">
                     <span>Login</span>
                     <div class="btn-shine"></div>

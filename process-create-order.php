@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $model = $_POST['model'] ?? '';
     $serial_number = $_POST['serial_number'] ?? '';
     $additional_notes = $_POST['additional_notes'] ?? '';
-    $warranty_status = isset($_POST['warranty_check']) ? 1 : 0;
+    $warranty_status = 0; // Default to no warranty - can be changed by staff in orders page
     
     file_put_contents('debug_order.txt', "Device: $device_type, Issue: $issue_type, Brand: $brand, Model: $model\n", FILE_APPEND);
     

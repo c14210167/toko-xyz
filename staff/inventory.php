@@ -327,6 +327,14 @@ $categories = $cat_stmt->fetchAll(PDO::FETCH_ASSOC);
                 <span class="nav-icon">📊</span>
                 <span class="nav-text">Dashboard</span>
             </a>
+            <a href="pos.php" class="nav-item">
+                <span class="nav-icon">💳</span>
+                <span class="nav-text">Point of Sale</span>
+            </a>
+            <a href="session-history.php" class="nav-item">
+                <span class="nav-icon">📜</span>
+                <span class="nav-text">Session History</span>
+            </a>
             <a href="orders.php" class="nav-item">
                 <span class="nav-icon">🔧</span>
                 <span class="nav-text">Orders</span>
@@ -363,12 +371,6 @@ $categories = $cat_stmt->fetchAll(PDO::FETCH_ASSOC);
             <a href="activities.php" class="nav-item">
                 <span class="nav-icon">📋</span>
                 <span class="nav-text">Activity Logs</span>
-            </a>
-            <?php endif; ?>
-            <?php if (hasPermission('view_products')): ?>
-            <a href="products.php" class="nav-item">
-                <span class="nav-icon">🛍️</span>
-                <span class="nav-text">Products</span>
             </a>
             <?php endif; ?>
             <?php if (hasPermission('view_sales')): ?>
@@ -575,6 +577,36 @@ $categories = $cat_stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 
+    <!-- Edit Price Modal -->
+    <div id="editPriceModal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Price</h2>
+            <form id="editPriceForm">
+                <input type="hidden" name="item_id" id="priceItemId">
+                <div class="form-group">
+                    <label>Item: <strong id="priceItemName"></strong></label>
+                    <p>Current Price: <strong id="priceCurrentPrice"></strong></p>
+                </div>
+                <div class="form-group">
+                    <label>New Selling Price (Rp) *</label>
+                    <input type="number" name="selling_price" id="newSellingPrice" required min="0" step="1">
+                </div>
+                <div class="form-group">
+                    <label>New Unit Price (Rp) *</label>
+                    <input type="number" name="unit_price" id="newUnitPrice" required min="0" step="1">
+                </div>
+                <div class="form-group">
+                    <label>Reason for Price Change *</label>
+                    <textarea name="notes" rows="3" required placeholder="e.g., Market price adjustment, Supplier price change, etc."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn" onclick="closeEditPriceModal()">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Update Price</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Load inventory on page load
         document.addEventListener('DOMContentLoaded', function() {
@@ -651,6 +683,9 @@ $categories = $cat_stmt->fetchAll(PDO::FETCH_ASSOC);
                         <button class="btn btn-sm btn-success" onclick="showTransactionModal(${item.item_id}, '${item.name}', ${item.quantity})">
                             📝 Transaction
                         </button>
+                        <button class="btn btn-sm btn-warning" onclick="showEditPriceModal(${item.item_id}, '${item.name}', ${item.unit_price})">
+                            💰 Edit Price
+                        </button>
                         <?php endif; ?>
                     </td>
                 </tr>
@@ -693,6 +728,20 @@ $categories = $cat_stmt->fetchAll(PDO::FETCH_ASSOC);
         function closeTransactionModal() {
             document.getElementById('transactionModal').classList.remove('active');
             document.getElementById('transactionForm').reset();
+        }
+
+        function showEditPriceModal(itemId, itemName, currentPrice) {
+            document.getElementById('priceItemId').value = itemId;
+            document.getElementById('priceItemName').textContent = itemName;
+            document.getElementById('priceCurrentPrice').textContent = 'Rp ' + currentPrice.toLocaleString('id-ID');
+            document.getElementById('newSellingPrice').value = currentPrice;
+            document.getElementById('newUnitPrice').value = currentPrice;
+            document.getElementById('editPriceModal').classList.add('active');
+        }
+
+        function closeEditPriceModal() {
+            document.getElementById('editPriceModal').classList.remove('active');
+            document.getElementById('editPriceForm').reset();
         }
 
         // Add Item Form Submit
@@ -750,6 +799,39 @@ $categories = $cat_stmt->fetchAll(PDO::FETCH_ASSOC);
             .catch(err => {
                 console.error(err);
                 alert('Failed to record transaction');
+            });
+        });
+
+        // Edit Price Form Submit
+        document.getElementById('editPriceForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+
+            if (!confirm('Are you sure you want to update the price for this item?')) {
+                return;
+            }
+
+            fetch('api/update-product-price.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Price updated successfully!');
+                    closeEditPriceModal();
+                    loadInventory();
+                    loadStats();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Failed to update price');
             });
         });
 

@@ -126,6 +126,14 @@ $activities = $activity_stmt->fetchAll(PDO::FETCH_ASSOC);
                 <span class="nav-icon">📊</span>
                 <span class="nav-text">Dashboard</span>
             </a>
+            <a href="pos.php" class="nav-item">
+                <span class="nav-icon">💳</span>
+                <span class="nav-text">Point of Sale</span>
+            </a>
+            <a href="session-history.php" class="nav-item">
+                <span class="nav-icon">📜</span>
+                <span class="nav-text">Session History</span>
+            </a>
             <a href="orders.php" class="nav-item">
                 <span class="nav-icon">🔧</span>
                 <span class="nav-text">Orders</span>
@@ -146,12 +154,6 @@ $activities = $activity_stmt->fetchAll(PDO::FETCH_ASSOC);
                 <span class="nav-icon">🏢</span>
                 <span class="nav-text">Suppliers</span>
             </a>
-            <?php if (hasPermission('view_products')): ?>
-            <a href="products.php" class="nav-item">
-                <span class="nav-icon">🛍️</span>
-                <span class="nav-text">Products</span>
-            </a>
-            <?php endif; ?>
             <?php if (hasPermission('manage_roles') || hasPermission('manage_permissions')): ?>
             <a href="employees.php" class="nav-item">
                 <span class="nav-icon">👨‍💼</span>
@@ -200,12 +202,6 @@ $activities = $activity_stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="main-content">
         <div class="top-bar">
             <h1>Dashboard</h1>
-            <div class="top-bar-actions">
-                <div class="notification-badge">
-                    <span class="badge-icon">🔔</span>
-                    <span class="badge-count">3</span>
-                </div>
-            </div>
         </div>
 
         <div class="content-area">

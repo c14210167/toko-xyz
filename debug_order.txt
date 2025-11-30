@@ -159,3 +159,39 @@ Timeline inserted
 Costs inserted
 SUCCESS! Redirecting...
 
+=== NEW REQUEST ===
+2025-11-29 10:10:14
+Session: Array
+(
+    [user_logged_in] => 1
+    [user_id] => 9
+    [user_email] => d4niel.ap@gmail.com
+    [user_name] => Daniel Alexander
+    [user_phone] => 081914212121
+    [user_address] => 
+    [user_type] => customer
+    [user_location_id] => 
+)
+
+POST Data: Array
+(
+    [device_display] => Laptop
+    [issue_display] => Baterai cepat habis
+    [brand] => ASUS
+    [model] => TUF GAMING 404
+    [serial_number] => 
+    [additional_notes] => baterai cuma cepat habis di 20%
+    [device_type] => laptop
+    [issue_type] => Baterai cepat habis
+)
+
+POST request received
+Device: laptop, Issue: Baterai cepat habis, Brand: ASUS, Model: TUF GAMING 404
+Database connected
+Order number generated: SRV-000043
+Executing INSERT query...
+Order inserted successfully! Order ID: 79
+Timeline inserted
+Costs inserted
+SUCCESS! Redirecting...
+

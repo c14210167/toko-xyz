@@ -119,12 +119,6 @@ if ($_SESSION['user_type'] != 'customer') {
                             <label>Apakah ada yang ingin ditambahkan?</label>
                             <textarea id="additionalNotes" name="additional_notes" rows="4" placeholder="Jelaskan detail tambahan atau kerusakan lainnya..."></textarea>
                         </div>
-                        <div class="form-group">
-                            <label class="checkbox-container" style="display: flex; align-items: center; color: #e2e8f0;">
-                                <input type="checkbox" id="warrantyCheck" name="warranty_check" style="width: auto; margin-right: 0.5rem;">
-                                Masih dalam masa garansi
-                            </label>
-                        </div>
                         <button type="submit" class="btn-submit-order">
                             <span>Submit Order</span>
                             <div class="btn-shine"></div>

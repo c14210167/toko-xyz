@@ -160,12 +160,6 @@ $status_config = [
                 <span class="nav-text">Activity Logs</span>
             </a>
             <?php endif; ?>
-            <?php if (hasPermission('view_products')): ?>
-            <a href="products.php" class="nav-item">
-                <span class="nav-icon">🛍️</span>
-                <span class="nav-text">Products</span>
-            </a>
-            <?php endif; ?>
             <?php if (hasPermission('view_sales')): ?>
             <a href="sales.php" class="nav-item">
                 <span class="nav-icon">💰</span>

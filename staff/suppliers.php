@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once '../config/database.php';
+require_once '../includes/PermissionManager.php';
 require_once '../config/init_permissions.php';
 
 // Check permission - using inventory permission for now
@@ -10,6 +12,14 @@ if (!hasPermission('view_inventory')) {
 
 // Get user info
 $user_name = $_SESSION['user_name'] ?? 'User';
+
+// Get user roles
+$database = new Database();
+$conn = $database->getConnection();
+$permissionManager = new PermissionManager($conn, $_SESSION['user_id']);
+$roles = $permissionManager->getUserRoles();
+$role_names = array_map(function($role) { return $role['role_name']; }, $roles);
+$primary_role = !empty($role_names) ? $role_names[0] : 'Staff';
 
 // Motivational quotes
 $motivational_quotes = [
@@ -41,7 +51,7 @@ $motivational_quotes = [
                     <div class="status-indicator"></div>
                 </div>
                 <h3 class="user-name"><?php echo htmlspecialchars($user_name); ?></h3>
-                <p class="user-role">Staff</p>
+                <p class="user-role"><?php echo htmlspecialchars($primary_role); ?></p>
 
                 <!-- Motivational Quote Animation -->
                 <div class="motivation-container">
@@ -55,6 +65,14 @@ $motivational_quotes = [
                     <span class="nav-icon">📊</span>
                     <span class="nav-text">Dashboard</span>
                 </a>
+                <a href="pos.php" class="nav-item">
+                    <span class="nav-icon">💳</span>
+                    <span class="nav-text">Point of Sale</span>
+                </a>
+            <a href="session-history.php" class="nav-item">
+                <span class="nav-icon">📜</span>
+                <span class="nav-text">Session History</span>
+            </a>
                 <a href="orders.php" class="nav-item">
                     <span class="nav-icon">🔧</span>
                     <span class="nav-text">Orders</span>
@@ -93,9 +111,25 @@ $motivational_quotes = [
                     <span class="nav-text">Activity Logs</span>
                 </a>
                 <?php endif; ?>
+                <?php if (hasPermission('view_sales')): ?>
+                <a href="sales.php" class="nav-item">
+                    <span class="nav-icon">💰</span>
+                    <span class="nav-text">Sales</span>
+                </a>
+                <?php endif; ?>
+                <?php if (hasPermission('view_reports')): ?>
+                <a href="reports.php" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Reports</span>
+                </a>
+                <?php endif; ?>
             </nav>
 
             <div class="sidebar-footer">
+                <a href="view-as-customer.php" class="footer-btn btn-customer">
+                    <span>👤</span>
+                    <span>View as Customer</span>
+                </a>
                 <a href="../logout.php" class="footer-btn btn-logout">
                     <span>🚪</span>
                     <span>Logout</span>

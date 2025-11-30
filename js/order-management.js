@@ -353,8 +353,12 @@ async function openEditOrderModal(orderId) {
                 </div>
             `;
 
-            // Set service cost
+            // Set service cost and discount
             document.getElementById('serviceCostInput').value = result.summary.service_cost || 0;
+            document.getElementById('discountInput').value = result.summary.discount || 0;
+
+            // Set warranty status
+            document.getElementById('warrantyCheckbox').checked = result.order.warranty_status == 1;
 
             // Load spareparts
             loadSparepartsTable(result.spareparts);
@@ -437,12 +441,14 @@ function updateTotalSummary(summary) {
     document.getElementById('summaryServiceCost').textContent = 'Rp ' + parseInt(summary.service_cost || 0).toLocaleString('id-ID');
     document.getElementById('summarySpareparts').textContent = 'Rp ' + parseInt(summary.spareparts_total || 0).toLocaleString('id-ID');
     document.getElementById('summaryCustomCosts').textContent = 'Rp ' + parseInt(summary.custom_costs_total || 0).toLocaleString('id-ID');
+    document.getElementById('summaryDiscount').textContent = '- Rp ' + parseInt(summary.discount || 0).toLocaleString('id-ID');
     document.getElementById('summaryTotal').textContent = 'Rp ' + parseInt(summary.total_cost || 0).toLocaleString('id-ID');
 }
 
 async function updateServiceCost() {
     const orderId = document.getElementById('editOrderId').value;
     const serviceCost = document.getElementById('serviceCostInput').value;
+    const discount = document.getElementById('discountInput').value;
 
     try {
         const response = await fetch('api/update-service-cost.php', {
@@ -450,7 +456,8 @@ async function updateServiceCost() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 order_id: orderId,
-                service_cost: parseFloat(serviceCost)
+                service_cost: parseFloat(serviceCost),
+                discount: parseFloat(discount)
             })
         });
 
@@ -465,6 +472,38 @@ async function updateServiceCost() {
         }
     } catch (error) {
         alert('❌ Network error');
+    }
+}
+
+async function updateWarrantyStatus() {
+    const orderId = document.getElementById('editOrderId').value;
+    const warrantyCheckbox = document.getElementById('warrantyCheckbox');
+    const warrantyStatus = warrantyCheckbox.checked ? 1 : 0;
+
+    try {
+        const response = await fetch('api/update-warranty.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                order_id: orderId,
+                warranty_status: warrantyStatus
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            const statusText = warrantyStatus ? 'enabled' : 'disabled';
+            alert(`✅ Warranty ${statusText}!`);
+        } else {
+            alert('❌ Error: ' + result.error);
+            // Revert checkbox state on error
+            warrantyCheckbox.checked = !warrantyCheckbox.checked;
+        }
+    } catch (error) {
+        alert('❌ Network error');
+        // Revert checkbox state on error
+        warrantyCheckbox.checked = !warrantyCheckbox.checked;
     }
 }
 

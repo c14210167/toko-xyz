@@ -346,6 +346,15 @@ body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+.cost-item.discount-item {
+    color: #fbbf24;
+    font-weight: 500;
+}
+
+.cost-item.discount-item span:last-child {
+    color: #f59e0b;
+}
+
 .cost-total {
     display: flex;
     justify-content: space-between;
